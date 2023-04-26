@@ -1,10 +1,5 @@
 :root {
-    --black: #080705;
-    --charcoal: #40434e;
-    --wine: #702632;
-    --cordovan: #912f40;
     --white: #fffffa;
-
     --silver: #c5c5c5;
     --outer-space: #4c5b61;
     --battleship-gray: #829191;
@@ -51,7 +46,7 @@ h2 {
     display:flex;
     flex-wrap: wrap;
     width: 50%;
-    /* display: none; */
+    display: none;
 }
 
 #content #question p {
@@ -89,9 +84,9 @@ h2 {
     color: var(--white);
     border-radius: 10px;
     height: 50px;
-    width: 10%;
+    width: 150px;
     margin: 15%;
-    display: none;
+    /* display: none; */
 }
 
 footer {
@@ -108,4 +103,18 @@ footer button {
     color: var(--white);
     border-radius: 10px;
     height: 100%;
+}
+
+@media screen and (max-width: 480px) {
+
+    #content #question {
+        width: 100%;
+        padding: 20px;
+    }
+
+    #content #question button {
+        height: 40px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
 }
