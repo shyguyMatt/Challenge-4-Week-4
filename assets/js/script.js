@@ -4,6 +4,7 @@ var questionEl = $('#question')
 var headerEl = $('header')
 var timerEl = $('#timer')
 var fillEl = $('#fill')
+var timer
 var correctAnswers = 0;
 var incorrectAnswers = 0;
 var time = 120 // in seconds
@@ -39,6 +40,10 @@ var questions = [question = [
     "Number type",
     "Undefined type",
     "Null type"
+], question = [
+    "Is this question true or false?",
+    "True",
+    "False"
 ]];
 
 // function retrieves a random questions and creates buttons
@@ -105,14 +110,14 @@ goBtnEl.on('click', function () {
     goBtnEl.css("display", "none")
     retrieveQuestion();
     questionEl.css("display", "flex")
-    setInterval(timer, 1000);
+    timer = setInterval(countdown, 1000);
     headerEl.children().css('display', 'none')
     timerEl.css('display', 'block')
     var tempTimer = '00:00'
     timerEl.text(tempTimer)   
 })
 
-function timer() {
+function countdown() {
     var timer = ''
     time--
     var minutes = Math.floor(time/60)
@@ -134,6 +139,10 @@ fillEl.on('click', function () {
     retrieveQuestion();
 })
 
+function endGame() {
+    questionEl.empty();
+    clearInterval(timer);
+}
 function correct(clicked) {
     $(clicked).css('background-color', 'green')
     correctAnswers++
