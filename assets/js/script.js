@@ -61,8 +61,7 @@ function retrieveQuestion() {
         var r = getRandomInt(0, questions.length)            
     } while(checkIndex(r, usedQuestionIndex))
     usedQuestionIndex.push(r)
-
-    if(usedQuestionIndex.length == questions.length) endGame();
+    console.log(usedQuestionIndex.length)
 
     // empties the question field and creates a new paragraph tag
     // with the question in it.
@@ -111,7 +110,6 @@ function getRandomInt(min, max) {
 // listens to clicks on answer buttons, returns true if correct
 // otherwise false.
 questionEl.on('click', '.ansBtn', function (event) {
-    console.log($(event.target).attr('text'))
     if($(event.target).attr('ans') == 'true') correct(event.target)
     else incorrect(event.target);
     //retrieveQuestion();
@@ -119,6 +117,7 @@ questionEl.on('click', '.ansBtn', function (event) {
 
 // listener for the start button. starts the application.
 goBtnEl.on('click', function () {
+    usedQuestionIndex = []
     goBtnEl.css("display", "none")
     highscoresEl.css('display', 'none')
     showHighscoresEl.css('display', 'none')
@@ -203,7 +202,8 @@ function countdown() {
 // in order to see the correct answer before continueing the quiz
 fillEl.on('click', function () {
     fillEl.css('display', 'none')
-    retrieveQuestion();
+    if(usedQuestionIndex.length == questions.length) endGame();
+    else retrieveQuestion();
 })
 
 // this function ends the game
