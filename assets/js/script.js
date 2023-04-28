@@ -4,11 +4,17 @@ var questionEl = $('#question')
 var headerEl = $('header')
 var timerEl = $('#timer')
 var fillEl = $('#fill')
+var highscoresEl = $('#highscores')
+var scoreEl = $('#score')
+var showHighscoresEl = $('#show-highscores')
 var timer
 var correctAnswers = 0;
 var incorrectAnswers = 0;
-var time = 120 // in seconds
+var numOfQuestions = 0
+var setTime = 120 // in seconds
 
+// array of highscores
+var highscores = []
 // array of questions along with their answers
 var questions = [question = [
     "What is JavaScript?",
@@ -48,9 +54,15 @@ var questions = [question = [
 
 // function retrieves a random questions and creates buttons
 // with answers on them
+var usedQuestionIndex = []
 function retrieveQuestion() {
     // grabs a random int relating to 1 question from the questions array
-    r = getRandomInt(0, questions.length)
+    do {
+        var r = getRandomInt(0, questions.length)            
+    } while(checkIndex(r, usedQuestionIndex))
+    usedQuestionIndex.push(r)
+
+    if(usedQuestionIndex.length == questions.length) endGame();
 
     // empties the question field and creates a new paragraph tag
     // with the question in it.
@@ -60,7 +72,7 @@ function retrieveQuestion() {
 
     // function to check which array indexes have been used already
     var usedIndex = [];
-    function checkIndex(randIndex) {
+    function checkIndex(randIndex, usedIndex) {
         for(var k=0;k<usedIndex.length;k++) {
             if(randIndex == usedIndex[k]) return true;
         }
@@ -74,7 +86,7 @@ function retrieveQuestion() {
         //generates a new random array index if it has already been used
         do {
             var randIndex = getRandomInt(1, questions[r].length)            
-        } while(checkIndex(randIndex))
+        } while(checkIndex(randIndex, usedIndex))
         usedIndex.push(randIndex)
 
         questionEl.append("<div>");
@@ -108,8 +120,11 @@ questionEl.on('click', '.ansBtn', function (event) {
 // listener for the start button. starts the application.
 goBtnEl.on('click', function () {
     goBtnEl.css("display", "none")
+    highscoresEl.css('display', 'none')
+    showHighscoresEl.css('display', 'none')
     retrieveQuestion();
     questionEl.css("display", "flex")
+    time = setTime
     timer = setInterval(countdown, 1000);
     headerEl.children().css('display', 'none')
     timerEl.css('display', 'block')
@@ -117,6 +132,56 @@ goBtnEl.on('click', function () {
     timerEl.text(tempTimer)   
 })
 
+// listener for the submit button after the game has ended
+// records the users name and score
+scoreEl.on('click', '.submit', function(event) {
+    scoreEl.empty()
+    var tempScore = [
+        scoreEl.children().eq(4).text(),
+        correctAnswers+" out of "+questions.length
+]
+    highscores.push(tempScore)
+    scoreEl.css('display', 'none')
+    goBtnEl.css('display', 'block')
+    headerEl.children('h1').css('display', 'block')
+    headerEl.children('h2').css('display', 'block')
+    showHighscoresEl.css('display', 'block')
+})
+
+// listener for the show highscore button
+// builds a <div> that will display the names and scores of previous users
+var highSwitch = true
+showHighscoresEl.on('click', function () {
+    if(highSwitch == true) {
+        highscoresEl.css('display', 'block')
+        questionEl.css('display', 'none')
+        scoreEl.css('display', 'none')
+        goBtnEl.css('display', 'none')
+        headerEl.children('h1').css('display', 'none')
+        headerEl.children('h2').css('display', 'none')
+        for(var i=0; i<highscores.length; i++) {
+            highscoresEl.append('<h3>')
+            highscoresEl.children().last().text(highscores[i][0]+" got "+highscores[i][1])
+            highscoresEl.append('<div>')
+            highscoresEl.children().last().addClass('break')
+        }
+        highSwitch = false;
+        showHighscoresEl.text("Return")
+    } else {
+        goBtnEl.css('display', 'block')
+        headerEl.children('h1').css('display', 'block')
+        headerEl.children('h2').css('display', 'block')
+        highscoresEl.empty()
+        highscoresEl.css('display', 'none')
+        highSwitch = true
+        showHighscoresEl.text("Press here to view scores.")
+
+    }
+})
+
+// countdown timer
+// if it reaches 0 the game ends
+var time = 0
 function countdown() {
     var timer = ''
     time--
@@ -134,24 +199,54 @@ function countdown() {
     if (time <= 0) endGame();
 }
 
+// this creates listens for a click on the entire screen
+// in order to see the correct answer before continueing the quiz
 fillEl.on('click', function () {
     fillEl.css('display', 'none')
     retrieveQuestion();
 })
 
+// this function ends the game
+// it displays the score and provides a field for tha players name
 function endGame() {
-    questionEl.empty();
+    questionEl.css('display', 'none');
     clearInterval(timer);
+    fillEl.css('display', 'none')
+    timerEl.css('display', 'none')
+    highscoresEl.css('display', 'block')
+    scoreEl.css('display', 'flex')
+    scoreEl.append('<p>')
+    scoreEl.children().last().text("congradulations you got "+correctAnswers+" out of "+questions.length)
+    scoreEl.append('<div>')
+    scoreEl.children().last().addClass('break')
+    scoreEl.append('<p>')
+    scoreEl.children().last().text("please input a name below to save your score")
+    scoreEl.append('<div>')
+    scoreEl.children().last().addClass('break')
+    scoreEl.append('<input>')
+    scoreEl.append('<div>')
+    scoreEl.children().last().addClass('break')
+    scoreEl.append('<button>')
+    scoreEl.children().last().addClass('submit').text('Submit Score')
 }
+
+// executes when a qusetion is answerd correctly
+// adds to the correct answers total and turns the button green
 function correct(clicked) {
     $(clicked).css('background-color', 'green')
     correctAnswers++
     fillEl.css('display', 'block')
+    numOfQuestions++
 }
+
+// executes when a question is answered incorrectly
+// adds to the incorrect answers total, removes 5 seconds fromt the timer
+// and turns the incorrect button red aswell as the correct button green
 function incorrect(clicked) {
     $("[ans=true]").css('background-color', 'green')
     $(clicked).css('background-color', 'red')
     incorrectAnswers++
     time = time -5
     fillEl.css('display', 'block')
+    numOfQuestions++
 }
