@@ -124,6 +124,8 @@ goBtnEl.on('click', function () {
     retrieveQuestion();
     questionEl.css("display", "flex")
     time = setTime
+
+    // set interval to 1 second
     timer = setInterval(countdown, 1000);
     headerEl.children().css('display', 'none')
     timerEl.css('display', 'block')
